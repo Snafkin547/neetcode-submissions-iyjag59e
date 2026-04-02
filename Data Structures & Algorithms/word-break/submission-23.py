@@ -1,0 +1,49 @@
+class TrieNode:
+    def __init__(self):
+        self.children = {}
+        self.isEnd = False
+
+class Trie:
+    def __init__(self):
+        self.root = TrieNode()
+    
+    def insert(self, word):
+        curr = self.root
+        for c in word:
+            if c not in curr.children:
+                curr.children[c] = TrieNode()
+            curr = curr.children[c]
+        curr.isEnd = True
+    
+    def search(self, word):
+        curr = self.root
+        for c in word:
+            if c not in curr.children:
+                return False
+            curr = curr.children[c]
+        return curr.isEnd
+
+class Solution:
+    def wordBreak(self, s: str, wordDict: List[str]) -> bool:
+        # DP bottom up/Trie
+        n = len(s)
+        dp = [False] * (n + 1)
+        dp[n] = True
+        
+        trie = Trie()
+        t = 0
+        for word in wordDict:
+            trie.insert(word)
+            t = max(t, len(word))
+        
+        for i in range(len(s) - 1, -1, -1):
+            curr = trie.root
+            for j in range(i, min(len(s), i + t)):
+                c = s[j]
+                if c not in curr.children:
+                    break
+                curr = curr.children[c]
+                if curr.isEnd and dp[j + 1]:
+                    dp[i] = dp[j + 1]
+                    break
+        return dp[0]
